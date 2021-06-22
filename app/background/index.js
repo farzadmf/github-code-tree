@@ -1,32 +1,34 @@
 var isCommit = false;
 
-const open = () =>  $('.gct-folder').addClass('gct-folder-open');
-const close = () => $('.gct-folder').removeClass('gct-folder-open');
+const open = () => $(".gct-folder").addClass("gct-folder-open");
+const close = () => $(".gct-folder").removeClass("gct-folder-open");
 
-const isDiffOpen = (el) => $(el).hasClass('Details--on') && $(el).hasClass('open');
+const isDiffOpen = (el) =>
+  $(el).hasClass("Details--on") && $(el).hasClass("open");
 
-const openDiff = (el) => $(el).addClass('Details--on open');
-const closeDiff = (el) => $(el).removeClass('Details--on open');
+const openDiff = (el) => $(el).addClass("Details--on open");
+const closeDiff = (el) => $(el).removeClass("Details--on open");
 
 const expandAllDiffBlocks = () => {
-  $('#collapseAll').show();
-  $('#expandAll').hide();
-  $('#files .file').each((i, el) => openDiff(el));
-}
-
-const collapseAllDiffBlocks = () => {
-  $('#collapseAll').hide();
-  $('#expandAll').show();
-  $('#files .file').each((i, el) => closeDiff(el));
-}
-
-const reInjectHTML = (savedItems) => {
-  $('#gct-tree').replaceWith($(`${buildHtmlTree(buildTree(savedItems))}`));
-  setClickAction(savedItems); 
+  $("#collapseAll").show();
+  $("#expandAll").hide();
+  $("#files .file").each((i, el) => openDiff(el));
 };
 
-const injectHTML = (savedItems) => $(
-  `<div class="gct-file-tree">
+const collapseAllDiffBlocks = () => {
+  $("#collapseAll").hide();
+  $("#expandAll").show();
+  $("#files .file").each((i, el) => closeDiff(el));
+};
+
+const reInjectHTML = (savedItems) => {
+  $("#gct-tree").replaceWith($(`${buildHtmlTree(buildTree(savedItems))}`));
+  setClickAction(savedItems);
+};
+
+const injectHTML = (savedItems) =>
+  $(
+    `<div class="gct-file-tree">
       <div class="gct-header">
         <div id="openAll">Open All</div>
         <div id="closeAll">Close All</div>
@@ -38,7 +40,7 @@ const injectHTML = (savedItems) => $(
         <div id="refresh">Refresh</div>
       </div>
   </div>`
-).insertAfter('#js-repo-pjax-container>div:nth-of-type(1)');
+  ).insertAfter("#js-repo-pjax-container>div:nth-of-type(1)");
 
 const mergeObjects = (og, so) => {
   for (var key in so) {
@@ -46,22 +48,22 @@ const mergeObjects = (og, so) => {
       og[key] = {};
     }
 
-    if (so[key].hasOwnProperty('length')) {
-      og[key] = og[key].hasOwnProperty('length') ? og[key] : [];
+    if (so[key].hasOwnProperty("length")) {
+      og[key] = og[key].hasOwnProperty("length") ? og[key] : [];
       og[key].push(so[key][0]);
     }
 
-    if(typeof so[key] === 'object' && !so[key].hasOwnProperty('length')) {
+    if (typeof so[key] === "object" && !so[key].hasOwnProperty("length")) {
       mergeObjects(og[key], so[key]);
     }
   }
   return og;
-}
+};
 
-const openLargeDiff = () => $('.load-diff-button').click();
+const openLargeDiff = () => $(".load-diff-button").click();
 
 const init = (savedItems) => {
-  if ($('.js-diff-progressive-spinner').length || !$('#files').length) {
+  if ($(".js-diff-progressive-spinner").length || !$("#files").length) {
     return;
   }
 
@@ -75,87 +77,108 @@ const init = (savedItems) => {
     openLargeDiff();
   }
 
-  $('#openAll').click(() => open());
-  $('#closeAll').click(() => close());
+  $("#openAll").click(() => open());
+  $("#closeAll").click(() => close());
 
-  $('#expandAll').click(() => expandAllDiffBlocks());
-  $('#collapseAll').click(() => collapseAllDiffBlocks());
+  $("#expandAll").click(() => expandAllDiffBlocks());
+  $("#collapseAll").click(() => collapseAllDiffBlocks());
 
-  $('#refresh').click(() => reInjectHTML(savedItems));
+  $("#refresh").click(() => reInjectHTML(savedItems));
 
   setClickAction();
 
   const observer = new MutationObserver(() => {
-    $('.js-reviewed-checkbox').off('click');
+    $(".js-reviewed-checkbox").off("click");
     // recompute the tree when a file has been viewed or not
-    $('.js-reviewed-checkbox').on('click', () => reInjectHTML(savedItems));
-  })
-  
-  observer.observe(document.querySelector('.js-diff-progressive-container'), {attributes:true, childList:true, subtree: true});
-}
+    $(".js-reviewed-checkbox").on("click", () => reInjectHTML(savedItems));
+  });
+
+  observer.observe(document.querySelector(".js-diff-progressive-container"), {
+    attributes: true,
+    childList: true,
+    subtree: true,
+  });
+};
 
 const setClickAction = () => {
   // Click Functions
-  $('.gct-folder-name').click(obj => {
-    $($($(obj.currentTarget).parent()[0])[0]).toggleClass('gct-folder-open');
+  $(".gct-folder-name").click((obj) => {
+    $($($(obj.currentTarget).parent()[0])[0]).toggleClass("gct-folder-open");
   });
 
   // On file name click
-  $('.gct-file-name').click(obj => {
+  $(".gct-file-name").click((obj) => {
     var href = $(obj.currentTarget)[0].getAttribute("href");
     var file = $(`.file-info > a[href="${href}"]`).parent().parent().parent();
     openDiff(file);
   });
-}
+};
 
-const start = () => setInterval(() => {
-  chrome.storage.sync.get(['customRegex'], ({ customRegex }) => {
-    const regex = customRegex || '(http|https):\\/\\/(www\\.)?github[\\.]?[-a-zA-Z0-9]*\\.com';
+const start = () =>
+  setInterval(() => {
+    chrome.storage.sync.get(["customRegex"], ({ customRegex }) => {
+      const regex =
+        customRegex ||
+        "(http|https):\\/\\/(www\\.)?github[\\.]?[-a-zA-Z0-9]*\\.com";
 
-    if(!$('.gct-file-tree').length) {
-      urlPullRegex = RegExp(`${regex}\\/[-a-zA-Z0-9-_.]*\\/[-a-zA-Z0-9-_.]*\\/pull\\/[0-9]*\\/(files|commits)`);
-      urlCommitRegex = RegExp(`${regex}\\/[-a-zA-Z0-9_.]*\\/[-a-zA-Z0-9_.]*\\/commit`);
+      if (!$(".gct-file-tree").length) {
+        urlPullRegex = RegExp(
+          `${regex}\\/[-a-zA-Z0-9-_.]*\\/[-a-zA-Z0-9-_.]*\\/pull\\/[0-9]*\\/(files|commits)`
+        );
+        urlCommitRegex = RegExp(
+          `${regex}\\/[-a-zA-Z0-9_.]*\\/[-a-zA-Z0-9_.]*\\/commit`
+        );
 
-      isCommit = location.href.match(urlCommitRegex);
+        isCommit = location.href.match(urlCommitRegex);
 
-      if(
-        (location.href.match(urlPullRegex) || isCommit) // show only on PR or commit page
-      ) {
-        chrome.storage.sync.get(['closed', 'collapsed', 'folders', 'largeDiff'], items => init(items));
+        if (
+          location.href.match(urlPullRegex) ||
+          isCommit // show only on PR or commit page
+        ) {
+          chrome.storage.sync.get(
+            ["closed", "collapsed", "folders", "largeDiff"],
+            (items) => init(items)
+          );
+        }
       }
-    }
-  });
-}, 500);
+    });
+  }, 500);
 
-const buildHtmlTree = (tree)  => {
-    var content = '<ul id="gct-tree">';
+const buildHtmlTree = (tree) => {
+  var content = '<ul id="gct-tree">';
 
-    let unorderedList = [];
-    for(var key in tree) {
-      if(key === 'files') {
-        unorderedList = unorderedList.concat(tree.files.map(item => ({
-          type: 'file',
+  let unorderedList = [];
+  for (var key in tree) {
+    if (key === "files") {
+      unorderedList = unorderedList.concat(
+        tree.files.map((item) => ({
+          type: "file",
           name: item.name,
-          file: item
-        })));
-      }else {
-        unorderedList.push({
-          type: 'directory',
-          name: key
-        });
-      }
+          file: item,
+        }))
+      );
+    } else {
+      unorderedList.push({
+        type: "directory",
+        name: key,
+      });
     }
-    const orderedList = unorderedList.sort((a,b) => a.name.localeCompare(b.name));
+  }
+  const orderedList = unorderedList.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
-    orderedList.forEach(item => {
-      if(item.type === 'file') {
-        content += `
-          <li class="gct-file ${item.file.viewed ? 'viewed' : ''}">
+  orderedList.forEach((item) => {
+    if (item.type === "file") {
+      content += `
+          <li class="gct-file ${item.file.viewed ? "viewed" : ""}">
             <a class="gct-file-view">
-              ${item.file.viewed ? iconViewed() : ''}
+              ${item.file.viewed ? iconViewed() : ""}
             </a>
             <span>
-              <a class="gct-file-name" href="${item.file.link}">${iconFile()}  ${item.file.name}</a>
+              <a class="gct-file-name" href="${
+                item.file.link
+              }">${iconFile()}  ${item.file.name}</a>
               <span class="gct-file-changes">
                 <span class="gct-file-added">+${item.file.added}</span>
                 <span class="gct-file-removed">-${item.file.removed}</span>
@@ -163,48 +186,49 @@ const buildHtmlTree = (tree)  => {
             </span>
           </li>
         `;
-      }else {
-        content += `<li class="gct-folder gct-folder-open">
+    } else {
+      content += `<li class="gct-folder gct-folder-open">
           <span class="gct-folder-name">${iconFolder()} ${item.name}</span>
           <div class="gct-sub-folders">${buildHtmlTree(tree[item.name])}</div>
         </li>`;
-      }
-    });
+    }
+  });
 
-    content += '</ul>';
+  content += "</ul>";
 
-    return content;
-}
+  return content;
+};
 
-const buildTree = (savedItems)  => {
+const buildTree = (savedItems) => {
   var tree = {};
 
-  $('.file-info').map((i, item) => {
-    var diff = /\D*(\d+)\D+(\d+)\D+(\d+)\D*/
-      .exec(
-        $(item).find('.diffstat')[0]
-          .getAttribute("aria-label")
-      );
+  $(".file-info").map((i, item) => {
+    var diff = /\D*(\d+)\D+(\d+)\D+(\d+)\D*/.exec(
+      $(item).find(".diffstat")[0].getAttribute("aria-label")
+    );
 
-    if (!diff || diff.length < 4) { // skip the "Empty file removed" case
-      diff = ['0', '0', '0'];
+    if (!diff || diff.length < 4) {
+      // skip the "Empty file removed" case
+      diff = ["0", "0", "0"];
     } else {
-      diff = [diff[2], diff[2], diff[3]]
+      diff = [diff[2], diff[2], diff[3]];
     }
 
-
-    var pathString = $(item).find('a')[0];
+    var pathString = $(item).find("a")[0];
     var pathLink = pathString.getAttribute("href");
-    var filePath = $(item).parent('.file-header').data('path');
-    var itemSplitted = filePath.split('/');
-    var isViewed = $(item).next('.file-actions').find('.js-reviewed-checkbox').is(':checked');
+    var filePath = $(item).parent(".file-header").data("path");
+    var itemSplitted = filePath.split("/");
+    var isViewed = $(item)
+      .next(".file-actions")
+      .find(".js-reviewed-checkbox")
+      .is(":checked");
 
     var nodeObj = {};
     var nodeObjJoker = nodeObj;
     itemSplitted.map((node, i) => {
       if (itemSplitted.length === i + 1) {
-        nodeObjJoker['files'] = nodeObjJoker['files'] || [];
-        nodeObjJoker['files'].push({
+        nodeObjJoker["files"] = nodeObjJoker["files"] || [];
+        nodeObjJoker["files"].push({
           total: parseInt(diff[0]),
           added: parseInt(diff[1]),
           removed: parseInt(diff[2]),
@@ -233,33 +257,36 @@ const buildTree = (savedItems)  => {
   }
 
   return tree;
-}
+};
 
 const joinEmptyFolders = (obj, paths) => {
   let current = obj;
-  paths.map(path => current = current[path]);
+  paths.map((path) => (current = current[path]));
 
-  const files = Object.keys(current).filter(key => Array.isArray(current[key]));
+  const files = Object.keys(current).filter((key) =>
+    Array.isArray(current[key])
+  );
 
   Object.keys(current)
-    .filter(key => !Array.isArray(current[key])).map(key => {
-    const childPath = [...paths, key];
-    const folder = joinEmptyFolders(obj, childPath);
-    if (folder.merge && files.length === 0) {
-      childPath[childPath.length - 1] = `${key}/${folder.key}`;
-      current[`${key}/${folder.key}`] = folder.obj;
-      delete current[key];
+    .filter((key) => !Array.isArray(current[key]))
+    .map((key) => {
+      const childPath = [...paths, key];
+      const folder = joinEmptyFolders(obj, childPath);
+      if (folder.merge && files.length === 0) {
+        childPath[childPath.length - 1] = `${key}/${folder.key}`;
+        current[`${key}/${folder.key}`] = folder.obj;
+        delete current[key];
 
-      return {
-        merge: true,
-        obj: { ...current },
-        key: key,
-      };
-    }
-  });
+        return {
+          merge: true,
+          obj: { ...current },
+          key: key,
+        };
+      }
+    });
 
   // yes, I need to extract again the keys from the current, it could be modified
-  var keys = Object.keys(current).filter(key => !Array.isArray(current[key]));
+  var keys = Object.keys(current).filter((key) => !Array.isArray(current[key]));
 
   // has only sub-folder, so should merge the keys
   if (keys.length === 1) {
@@ -275,6 +302,6 @@ const joinEmptyFolders = (obj, paths) => {
   }
 
   return current;
-}
+};
 
 $(document).ready(start);

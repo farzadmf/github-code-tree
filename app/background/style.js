@@ -1,5 +1,5 @@
 const injectCss = (isCommit) => {
-  $('#gct-style').remove();
+  $("#gct-style").remove();
   $(`<style type='text/css' id="gct-style">
     body.full-width #files {
       margin-left: 300px;

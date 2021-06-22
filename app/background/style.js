@@ -17,7 +17,7 @@ const injectCss = (isCommit) => {
 
     .gct-file-tree {
       margin-right: 30px;
-      height: 100vh;
+      height: 90vh;
       overflow-y: scroll;
       padding: 10px;
       position: fixed;

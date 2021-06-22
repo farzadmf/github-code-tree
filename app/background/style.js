@@ -16,17 +16,29 @@ const injectCss = (isCommit) => {
     }
 
     .gct-file-tree {
-      position: sticky;
-      top: ${isCommit ? 20 : 70}px;
-      background-color: transparent;
-      left: 20px;
-      z-index: 28;
-      width: 280px;
+      margin-right: 30px;
+      height: 100vh;
+      overflow-y: scroll;
+      padding: 10px;
+      position: fixed;
+      width: 350px;
+      z-index: 99;
+    }
+
+    /*
+    .gct-file-tree {
+      /* background-color: transparent; */
       border: 1px solid #ddd;
+      float: left;
+      left: 20px;
       overflow: auto;
       padding: 10px;
-      float: left;
+      position: sticky;
+      top: ${isCommit ? 20 : 70}px;
+      width: 280px;
+      z-index: 28;
     }
+    */
 
     .gct-icon {
       color: rgba(3, 47, 98, .4);
@@ -85,4 +97,14 @@ const injectCss = (isCommit) => {
       cursor: pointer;
     }
   </style>`).appendTo("head");
+
+  $("main#js-repo-pjax-container").css("padding-left", "340px");
+  $("body.full-width #files.diff-view.commentable.js-diff-container").css(
+    "margin-left",
+    "0"
+  );
+  $(".footer.container-xl.width-full.p-responsive").attr(
+    "style",
+    "padding-left: 370px !important"
+  );
 };

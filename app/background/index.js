@@ -10,14 +10,10 @@ const openDiff = (el) => $(el).addClass("Details--on open");
 const closeDiff = (el) => $(el).removeClass("Details--on open");
 
 const expandAllDiffBlocks = () => {
-  $("#collapseAll").show();
-  $("#expandAll").hide();
   $("#files .file").each((i, el) => openDiff(el));
 };
 
 const collapseAllDiffBlocks = () => {
-  $("#collapseAll").hide();
-  $("#expandAll").show();
   $("#files .file").each((i, el) => closeDiff(el));
 };
 
@@ -26,7 +22,7 @@ const reInjectHTML = (savedItems) => {
   setClickAction(savedItems);
 };
 
-const injectHTML = (savedItems) =>
+const injectHTML = (savedItems) => {
   $(
     `<div class="gct-file-tree">
       <div class="gct-header">
@@ -40,7 +36,8 @@ const injectHTML = (savedItems) =>
         <div id="refresh">Refresh</div>
       </div>
   </div>`
-  ).insertAfter("#js-repo-pjax-container>div:nth-of-type(1)");
+  ).insertBefore("main#js-repo-pjax-container");
+};
 
 const mergeObjects = (og, so) => {
   for (var key in so) {
@@ -214,10 +211,11 @@ const buildTree = (savedItems) => {
       diff = [diff[2], diff[2], diff[3]];
     }
 
-    var pathString = $(item).find("a")[0];
+    var pathString = $(item).find("a.Link--primary")[0];
     var pathLink = pathString.getAttribute("href");
     var filePath = $(item).parent(".file-header").data("path");
     var itemSplitted = filePath.split("/");
+
     var isViewed = $(item)
       .next(".file-actions")
       .find(".js-reviewed-checkbox")
@@ -225,6 +223,7 @@ const buildTree = (savedItems) => {
 
     var nodeObj = {};
     var nodeObjJoker = nodeObj;
+
     itemSplitted.map((node, i) => {
       if (itemSplitted.length === i + 1) {
         nodeObjJoker["files"] = nodeObjJoker["files"] || [];

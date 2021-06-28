@@ -108,3 +108,12 @@ const injectCss = (isCommit) => {
     "padding-left: 370px !important"
   );
 };
+
+const revertCSS = () => {
+  $("main#js-repo-pjax-container").css("padding-left", "");
+  $("body.full-width #files.diff-view.commentable.js-diff-container").css(
+    "margin-left",
+    "0"
+  );
+  $(".footer.container-xl.width-full.p-responsive").attr("style", "");
+};

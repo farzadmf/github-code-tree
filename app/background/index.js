@@ -88,9 +88,17 @@ const init = (savedItems) => {
     $(".js-reviewed-checkbox").off("click");
     // recompute the tree when a file has been viewed or not
     $(".js-reviewed-checkbox").on("click", () => reInjectHTML(savedItems));
+
+    if (
+      !location.href.match(urlPullRegex) &&
+      !isCommit // show only on PR or commit page
+    ) {
+      $(".gct-file-tree").replaceWith("");
+      revertCSS();
+    }
   });
 
-  observer.observe(document.querySelector(".js-diff-progressive-container"), {
+  observer.observe(document.querySelector("main#js-repo-pjax-container"), {
     attributes: true,
     childList: true,
     subtree: true,
@@ -142,6 +150,8 @@ const start = () =>
   }, 500);
 
 const buildHtmlTree = (tree) => {
+  injectCss(isCommit); // style.js
+
   var content = '<ul id="gct-tree">';
 
   let unorderedList = [];

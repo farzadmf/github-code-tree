@@ -99,10 +99,7 @@ const injectCss = (isCommit) => {
   </style>`).appendTo("head");
 
   $("main#js-repo-pjax-container").css("padding-left", "340px");
-  $("body.full-width #files.diff-view.commentable.js-diff-container").css(
-    "margin-left",
-    "0"
-  );
+  $("#files").css("margin-left", "0");
   $(".footer.container-xl.width-full.p-responsive").attr(
     "style",
     "padding-left: 370px !important"
@@ -111,9 +108,6 @@ const injectCss = (isCommit) => {
 
 const revertCSS = () => {
   $("main#js-repo-pjax-container").css("padding-left", "");
-  $("body.full-width #files.diff-view.commentable.js-diff-container").css(
-    "margin-left",
-    "0"
-  );
+  $("#files").css("margin-left", "0");
   $(".footer.container-xl.width-full.p-responsive").attr("style", "");
 };
